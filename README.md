@@ -46,5 +46,5 @@ Log into Datadog and get your API-KEY
  ssh and generate application traces.  Also make sure you have watch installed on
  your computer before running this script.
  
-   ./app-test-script.sh
+    ./app-test-script.sh
 

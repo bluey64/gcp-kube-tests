@@ -1,0 +1,111 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: datadog-agent
+spec:
+  template:
+    metadata:
+      labels:
+        app: datadog-agent
+      name: datadog-agent
+    spec:
+      serviceAccountName: datadog-agent
+      containers:
+      - image: datadog/agent:latest
+        imagePullPolicy: Always
+        name: datadog-agent
+        ports:
+          - containerPort: 8125
+            # Custom metrics via DogStatsD - uncomment this section to enable custom metrics collection
+            hostPort: 8125
+            name: dogstatsdport
+            protocol: UDP
+          - containerPort: 8126
+            # Trace Collection (APM) - uncomment this section to enable APM
+            hostPort: 8126
+            name: traceport
+            protocol: TCP
+        env:
+          - name: DD_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: datadog-secret
+                key: api-key
+          - name: DD_COLLECT_KUBERNETES_EVENTS
+            value: "true"
+          - name: DD_LEADER_ELECTION
+            value: "true"
+          - name: KUBERNETES
+            value: "true"
+          - name: DD_KUBERNETES_KUBELET_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+            # Required for APM tracing
+          - name: DD_APM_ENABLED
+            value: "true"
+            # Required for LOGS tracing
+          - name: DD_LOGS_ENABLED
+            value: "true"
+            # Required for LOGS tracing
+          - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+            value: "true"
+          - name: DD_AC_EXCLUDE
+            value: "name:datadog-agent"
+            # Required for Live Processes tracing
+          - name: DD_PROCESS_AGENT_ENABLED
+            value: "true"
+            # Required for APM tracing
+          - name: DD_APM_NON_LOCAL_TRAFFIC
+            value: "true"
+            # Required for JMX metrics
+          - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
+            value: "true"
+        resources:
+          requests:
+            memory: "328Mi"
+            cpu: "200m"
+          limits:
+            memory: "328Mi"
+            cpu: "200m"
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock
+          - name: procdir
+            mountPath: /host/proc
+            readOnly: true
+          - name: cgroups
+            mountPath: /host/sys/fs/cgroup
+            readOnly: true
+          - name: passwd
+            mountPath: /etcpasswd
+            readOnly: true
+            # Used for Config-maps
+#         - name: dd-agent-config
+#           mountPath: /conf.d
+        livenessProbe:
+          exec:
+            command:
+            - ./probe.sh
+          initialDelaySeconds: 15
+          periodSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: dockersocket
+        - hostPath:
+            path: /proc
+          name: procdir
+        - hostPath:
+            path: /sys/fs/cgroup
+          name: cgroups
+        - hostPath:
+            path: /etc/passwd
+          name: passwd
+          # Used for each config-map
+#       - name: dd-agent-config
+#         configMap:
+#           name: dd-agent-config
+#           items:
+#           - key: etcd-config
+#             path: etcd.yaml

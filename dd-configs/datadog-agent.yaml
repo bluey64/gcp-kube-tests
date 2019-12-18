@@ -37,6 +37,8 @@ spec:
             value: "true"
           - name: KUBERNETES
             value: "true"
+          - name: DD_HEALTH_PORT
+            value: "5555"
           - name: DD_KUBERNETES_KUBELET_HOST
             valueFrom:
               fieldRef:

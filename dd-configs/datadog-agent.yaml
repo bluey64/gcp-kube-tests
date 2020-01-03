@@ -63,6 +63,16 @@ spec:
             # Required for JMX metrics
           - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
             value: "true"
+            # Required for if you need a proxy to reach Datadog
+         # - name: DD_PROXY_HTTP
+         #   value: "http://<ipaddress>:8080"
+         # - name: DD_PROXY_HTTPS
+         #   value: "http://<ipaddress>:8080"
+            # Required for if you need to send logs via 443
+          - name: DD_LOGS_CONFIG_USE_PORT_443
+            value: "true"
+          - name: DD_LOG_LEVEL
+            value: "debug"
         resources:
           requests:
             memory: "328Mi"

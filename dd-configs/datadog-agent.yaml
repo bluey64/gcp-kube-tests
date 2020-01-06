@@ -73,6 +73,10 @@ spec:
             value: "true"
           - name: DD_LOG_LEVEL
             value: "debug"
+         # - name: DD_LOGS_CONFIG_USE_COMPRESSION
+         #   value: “true”
+         # - name: DD_LOGS_CONFIG_COMPRESSION_LEVEL
+         #   value: 6
         resources:
           requests:
             memory: "328Mi"

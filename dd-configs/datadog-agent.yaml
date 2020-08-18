@@ -69,14 +69,14 @@ spec:
          # - name: DD_PROXY_HTTPS
          #   value: "http://<ipaddress>:8080"
             # Required for if you need to send logs via 443
-          - name: DD_LOGS_CONFIG_USE_PORT_443
+          - name: DD_LOGS_CONFIG_USE_PORT_HTTPS
             value: "true"
           - name: DD_LOG_LEVEL
             value: "debug"
-         # - name: DD_LOGS_CONFIG_USE_COMPRESSION
-         #   value: “true”
-         # - name: DD_LOGS_CONFIG_COMPRESSION_LEVEL
-         #   value: 6
+          - name: DD_LOGS_CONFIG_USE_COMPRESSION
+            value: “true”
+          - name: DD_LOGS_CONFIG_COMPRESSION_LEVEL
+            value: "6"
         resources:
           requests:
             memory: "328Mi"

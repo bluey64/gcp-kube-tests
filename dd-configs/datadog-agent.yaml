@@ -20,7 +20,7 @@ metadata:
   labels: {}
 type: Opaque
 data:
-  api-key: PUT_YOUR_BASE64_ENCODED_API_KEY_HERE
+  api-key: "$APIKEY"
 ---
 # Source: datadog/templates/secret-cluster-agent-token.yaml
 apiVersion: v1
@@ -31,7 +31,7 @@ metadata:
   labels: {}
 type: Opaque
 data:
-  token: PUT_A_BASE64_ENCODED_RANDOM_STRING_HERE
+  token: "$APIKEYB64"
 ---
 # Source: datadog/templates/install_info-configmap.yaml
 apiVersion: v1

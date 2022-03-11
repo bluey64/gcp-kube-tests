@@ -12,11 +12,11 @@ then
 echo "Creating role for Kube State Metrics"
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format='value(config.account)') &> /dev/null
 
-echo "Deploying Kube State Metrics"
-kubectl apply -f dd-configs/kube-state-metrics
+#echo "Deploying Kube State Metrics"
+#kubectl apply -f dd-configs/kube-state-metrics
 
-echo "Creating the API secret"
-kubectl create secret generic datadog-secret --from-literal api-key="$APIKEY"
+#echo "Creating the API secret"
+#kubectl create secret generic datadog-secret --from-literal api-key="$APIKEY"
 
 echo "installing the ClusterRole for DD"
 kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrole.yaml"
@@ -27,11 +27,20 @@ kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/maste
 echo "Creating the Cluster Bind Role"
 kubectl create -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/rbac/clusterrolebinding.yaml"
 
-echo "Creating default Config map"
-kubectl create configmap datadogtoken --from-literal="event.tokenKey"="0"
+echo "Creating the Cluster Agent Rbac"
+kubectl apply -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/cluster-agent/rbac.yaml"
 
-echo "Creating the DaemonSet for Datadog"
-kubectl create -f dd-configs/datadog-agent.yaml
+echo "Creating Cluster Agent Manifest"
+kubectl apply -f "https://raw.githubusercontent.com/DataDog/datadog-agent/master/Dockerfiles/manifests/cluster-agent/cluster-agent-rbac.yaml"
+
+#echo "Creating default Config map"
+#kubectl create configmap datadogtoken --from-literal="event.tokenKey"="0"
+
+#echo "Creating the DaemonSet for Datadog"
+#kubectl create -f dd-configs/datadog-agent.yaml
+sed "s/\"\$APIKEY\"/\"$APIKEYB64\"/" $HOME/gcp-kube-tests/dd-configs/datadog-agent-all-features.yaml | sed "s/\"\$APIKEYB64\"/\"$APIKEYB64\"/" > $HOME/gcp-kube-tests/dd-configs/datadog-agent-all-features-go.yaml
+kubectl apply -f $HOME/gcp-kube-tests/dd-configs/datadog-agent-all-features-go.yaml
+
 else
 echo "Please enter API key for Datadog and run the script again."
 
